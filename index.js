@@ -25,9 +25,13 @@ async function run() {
 
     //get all services
     app.get("/services", async (req, res) => {
-      const query = {};
-      const services = await servicesCollection.find(query).toArray();
-      res.send(services);
+      try {
+        const query = {};
+        const services = await servicesCollection.find(query).toArray();
+        res.send(services);
+      } catch (error) {
+        res.send(error);
+      }
     });
 
     //   get one service
