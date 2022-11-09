@@ -17,11 +17,28 @@ const client = new MongoClient(uri, {
   serverApi: ServerApiVersion.v1,
 });
 
+// verify jwt token
+function verifyJWT(req, res, next) {
+  const authHeader = req.headers.authorization;
+  if (!authHeader) {
+    return res.status(401).send({ message: "UnAuthorized Access" });
+  }
+  const token = authHeader.split(" ")[1];
+  jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, function (err, decoded) {
+    if (err) {
+      return res.status(403).send({ message: "Forbidden access" });
+    }
+    req.decoded = decoded;
+    next();
+  });
+}
+
 async function run() {
   try {
     await client.connect();
     console.log("Database connected");
     const servicesCollection = client.db("doctor_vai").collection("services");
+    const userCollection = client.db("doctor_vai").collection("user");
 
     //get all services
     app.get("/services", async (req, res) => {
@@ -41,6 +58,20 @@ async function run() {
         const query = { _id: ObjectId(id) };
         const service = await servicesCollection.findOne(query);
         res.send(service);
+      } catch (error) {
+        res.send(error);
+      }
+    });
+
+    //   login user
+    app.put("/user/:email", async (req, res) => {
+      try {
+        const email = req.params.email;
+        const token = jwt.sign(
+          { email: email },
+          process.env.ACCESS_TOKEN_SECRET
+        );
+        res.send({ token });
       } catch (error) {
         res.send(error);
       }
