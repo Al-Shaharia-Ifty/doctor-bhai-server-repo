@@ -38,7 +38,7 @@ async function run() {
     await client.connect();
     console.log("Database connected");
     const servicesCollection = client.db("doctor_vai").collection("services");
-    const userCollection = client.db("doctor_vai").collection("user");
+    const reviewCollection = client.db("doctor_vai").collection("reviews");
 
     //get all services
     app.get("/services", async (req, res) => {
@@ -63,6 +63,18 @@ async function run() {
       }
     });
 
+    //   get one service review
+    app.get("/review/:name", async (req, res) => {
+      try {
+        const name = req.params.name;
+        const query = { service: name };
+        const result = await reviewCollection.find(query).toArray();
+        res.send(result);
+      } catch (error) {
+        console.log(error);
+      }
+    });
+
     //   login user
     app.put("/user/:email", async (req, res) => {
       try {
@@ -72,6 +84,21 @@ async function run() {
           process.env.ACCESS_TOKEN_SECRET
         );
         res.send({ token });
+      } catch (error) {
+        res.send(error);
+      }
+    });
+
+    //   add review
+    app.post("/add-review/:id", async (req, res) => {
+      try {
+        const id = req.params.id;
+        const query = { _id: ObjectId(id) };
+        const service = await servicesCollection.findOne(query);
+        const reviews = service.review;
+        const result = await reviews.insertOne(comment);
+        console.log(result);
+        res.send(result);
       } catch (error) {
         res.send(error);
       }
