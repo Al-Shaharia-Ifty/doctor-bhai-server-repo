@@ -35,7 +35,6 @@ function verifyJWT(req, res, next) {
 
 async function run() {
   try {
-    await client.connect();
     console.log("Database connected");
     const servicesCollection = client.db("doctor_vai").collection("services");
     const reviewCollection = client.db("doctor_vai").collection("reviews");
@@ -73,6 +72,15 @@ async function run() {
       } catch (error) {
         console.log(error);
       }
+    });
+
+    //   add a review
+    app.post("/add-review/:name", async (req, res) => {
+      try {
+        const comment = req.body;
+        const result = await reviewCollection.insertOne(comment);
+        res.send({ success: true, result });
+      } catch (error) {}
     });
 
     //   login user
