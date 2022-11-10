@@ -69,9 +69,7 @@ async function run() {
         const query = { service: name };
         const result = await reviewCollection.find(query).toArray();
         res.send(result);
-      } catch (error) {
-        console.log(error);
-      }
+      } catch (error) {}
     });
 
     //   add a review
@@ -89,6 +87,27 @@ async function run() {
       const query = { email: email };
       const result = await reviewCollection.find(query).toArray();
       res.send(result);
+    });
+
+    // edit user review
+    app.put("/review/:id", async (req, res) => {
+      try {
+        const id = req.params.id;
+        const comment = req.body;
+        const filter = { _id: ObjectId(id) };
+        const option = { upsert: true };
+        const updateDoc = {
+          $set: comment,
+        };
+        const result = await reviewCollection.updateOne(
+          filter,
+          updateDoc,
+          option
+        );
+        res.send({ success: true, result });
+      } catch (error) {
+        res.send(error);
+      }
     });
 
     // delete user review
