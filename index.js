@@ -62,6 +62,13 @@ async function run() {
       }
     });
 
+    // add a service
+    app.post("/add-service", async (req, res) => {
+      const service = req.body;
+      const result = await servicesCollection.insertOne(service);
+      res.send({ success: true, result });
+    });
+
     //   get one service review
     app.get("/review/:name", async (req, res) => {
       try {
@@ -73,7 +80,7 @@ async function run() {
     });
 
     //   add a review
-    app.post("/add-review/:name", async (req, res) => {
+    app.post("/add-review/", async (req, res) => {
       try {
         const comment = req.body;
         const result = await reviewCollection.insertOne(comment);
