@@ -83,6 +83,14 @@ async function run() {
       } catch (error) {}
     });
 
+    // get user reviews
+    app.get("/my-review", verifyJWT, async (req, res) => {
+      const email = req.decoded.email;
+      const query = { email: email };
+      const result = await reviewCollection.find(query).toArray();
+      res.send(result);
+    });
+
     //   login user
     app.put("/user/:email", async (req, res) => {
       try {
@@ -92,21 +100,6 @@ async function run() {
           process.env.ACCESS_TOKEN_SECRET
         );
         res.send({ token });
-      } catch (error) {
-        res.send(error);
-      }
-    });
-
-    //   add review
-    app.post("/add-review/:id", async (req, res) => {
-      try {
-        const id = req.params.id;
-        const query = { _id: ObjectId(id) };
-        const service = await servicesCollection.findOne(query);
-        const reviews = service.review;
-        const result = await reviews.insertOne(comment);
-        console.log(result);
-        res.send(result);
       } catch (error) {
         res.send(error);
       }
