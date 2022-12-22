@@ -1,16 +1,16 @@
 const express = require("express");
 const cors = require("cors");
-const jwt = require("jsonwebtoken");
-require("dotenv").config();
 const app = express();
+const jwt = require("jsonwebtoken");
 const port = process.env.PORT || 5000;
+require("dotenv").config();
 
-// middle ware
+// meddle ware
 app.use(cors());
 app.use(express.json());
 
 const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
-const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.vtk80fb.mongodb.net/?retryWrites=true&w=majority`;
+const uri = `${process.env.DB_URL}`;
 const client = new MongoClient(uri, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
@@ -35,19 +35,14 @@ function verifyJWT(req, res, next) {
 
 async function run() {
   try {
-    console.log("Database connected");
     const servicesCollection = client.db("doctor_vai").collection("services");
     const reviewCollection = client.db("doctor_vai").collection("reviews");
 
     //get all services
     app.get("/services", async (req, res) => {
-      try {
-        const query = {};
-        const services = await servicesCollection.find(query).toArray();
-        res.send(services);
-      } catch (error) {
-        res.send(error);
-      }
+      const query = {};
+      const course = await servicesCollection.find(query).toArray();
+      res.send(course);
     });
 
     //   get one service
